@@ -10,4 +10,4 @@ pageVector = [vector for i in range(maxPage)] #the vector clock in page
 
 
 # tracelines = count(open("trace.data").readlines()) #the total line in trace file
-tracelines = 57334 # the total line in test trace file
+tracelines = 16 # the total line in test trace file
