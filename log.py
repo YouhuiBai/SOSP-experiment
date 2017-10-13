@@ -3,7 +3,7 @@ import threading
 class Log :
 	def __init__(self) :
 		print("The Log class")
-	def writeEntry(self, logid, logentry) : # write one log entry to log file
+	def writeEntry(self, logid, logentry) : # write one log entry to file
 		fp1 = open("%d.log"%(logid), "a") # output log entry to log file
 		fp2 = open("%d.data"%(logid), "a") # output log entry to analysis file
 		tmp = []
@@ -20,5 +20,5 @@ class Log :
 		fp.write(b'\x0a') # a new line
 		fp.flush()
 		fp.close()
-	def getLog(logid) :
+	def getLog(self, logid) :
 		return open("%d.log"%(logid))
