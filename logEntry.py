@@ -40,4 +40,7 @@ class LogEntry:
             
     def addOnePageUpdate(self, line):
         self.entryList.append(line)
-        self.numOfPages++
+        self.numOfPages += 1
+        
+    def __str__(self):
+        return ""
