@@ -6,7 +6,7 @@ logNum = 4 # the number of log in system
 maxPage = 131218 # the max page number in test trace file
 pageMutex = [threading.Lock() for i in range(maxPage)]  #the content in list is the mutex flag for one page, multithreads contend the mutex
 
-vector = [0] * workerNum
+vector = [0] * logNum
 pageVector = [vector for i in range(maxPage)] #the vector clock in page
 
 
