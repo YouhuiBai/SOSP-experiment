@@ -18,7 +18,7 @@ class TxnExecutor :
 			logentry = LogEntry(int(txn), line1, line2)
 		else :
 			logentry = LogEntry(int(txn), line1)
-		LogDispatcher.Queue.append(logentry.entryList)
+		LogDispatcher.Queue.append(logentry.__str__())
 
 		LogDispatcher.mutex.release()
 
