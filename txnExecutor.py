@@ -3,6 +3,7 @@ import page
 from logDispatcher import *
 import linecache
 import random
+from logEntry import *
 
 
 class TxnExecutor :
@@ -13,11 +14,11 @@ class TxnExecutor :
 	def commit(self, txn, line1, line2 = "") :
 		LogDispatcher.mutex.acquire()
 
-		logentry = [int(txn), int(line1)]
-		LogDispatcher.Queue.append(logentry)
 		if not line2 == "" :
-			logentry = [int(txn), int(line2)]
-			LogDispatcher.Queue.append(logentry)
+			logentry = LogEntry(int(txn), line1, line2)
+		else :
+			logentry = LogEntry(int(txn), line1)
+		LogDispatcher.Queue.append(logentry.entryList)
 
 		LogDispatcher.mutex.release()
 

@@ -28,19 +28,21 @@ class LogEntry:
         self.numOfPages = 0
         self.entryList = list()
         self.txnId = 0
-        self.vc = NULL
+        self.vc = None
 
     def __init__(self, tId, line1, line2=""):
+        self.numOfPages = 0
         self.txnId = tId
         self.entryList = list()
-        self.vc = NULL
+        self.entryList.append(tId) #add the transaction id to log entry
+        self.vc = None
         self.addOnePageUpdate(line1)
         if line2 != "":
-            self.addOnePageUpdate(line1)
+            self.addOnePageUpdate(line2)
 
     def addOnePageUpdate(self, line):
-        self.entryList.append(line)
+        self.entryList.append(int(line))
         self.numOfPages += 1
-        
+
     def __str__(self):
         return ""
