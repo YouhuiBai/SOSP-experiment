@@ -13,6 +13,12 @@ class Log :
 
 	def increLogLengthBy(self, delta):
 		self.length += delta
+		
+	def increVCBit(self):
+		self.currentVC[self.logId] += 1
+		
+	def setVectorClock(self, vc):
+		self.currentVC = vc.copy()
 
 	def flushEntry(self, logid) : # write one log entry to file
 		context = zmq.Context()

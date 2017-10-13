@@ -7,6 +7,7 @@ import page
 import logEntry
 from test._test_multiprocessing import exception_throwing_generator
 from log import *
+from _overlapped import NULL
 
 def getScheduleTypeStr(t):
 	if t == 0:
@@ -32,6 +33,8 @@ class LogDispatcher :
 		print("The LogDispatcher class")
 		self.numOfLogs = numOfLogs
 		self.typeOfSchedule = typeOfSchedule
+		self.entryToLogDict = dict()
+		self.logList = list()
 		print("Initialize LogDispatcher with ", numOfLogs,
 			 " logs and the type of schedule is ",
 			               getScheduleTypeStr(typeOfSchedule))
@@ -39,7 +42,9 @@ class LogDispatcher :
 		create log flush thread
 		'''
 		for i in range(self.numOfLogs) :
-			t = threading.Thread(target = Log().flushEntry, args = (logId, ))
+			indivLog = Log(i, self.numOfLogs)
+			self.logList.append(indivLog)
+			t = threading.Thread(target = indivLog.flushEntry, args = (logId, ))
 			t.serDaemon(True) # set the thread as Daemon thread
 			t.start()
 
@@ -49,10 +54,10 @@ class LogDispatcher :
 		print("update vc of page ",pageId, " to ", vc)
 
 	def addTxnEntryToLog(self, logId, logEty):
-		logEtyList = entryToLogDict[logId]
+		logEtyList = self.entryToLogDict[logId]
 		if logEtyList == NULL:
 			logEtyList = list()
-			entryToLogDict[logId] = logEtyList
+			self.entryToLogDict[logId] = logEtyList
 		logEtyList.append(logEty)
 
 	'''
@@ -61,12 +66,23 @@ class LogDispatcher :
 	            to a list of log entries
 	'''
 	def generateLogPlans(self, entryList):
-		entryToLogDict = dict();
 		if self.typeOfSchedule == 0:
 			#random
 			for logE in entryList:
 				logId = logE.txnId % self.numOfLogs
-				#obtain vc and update the log vc
+				#obtain the max of all pages' vc
+				newVC = [0] * self.numOfLogs
+				for pageId in logE.entryList:
+					newVC = getMaxVC(newVC, pageVector[pageId])
+				#obtain the max of the above vc and log vc
+				self.logList[logId].increVCBit()
+				newVC = getMaxVC(newVC, self.logList[logId].currentVC)
+				
+				#set log Entry vc and log vc and page vc
+				logE.setVectorClock(newVC)
+				self.logList[logId].setVectorClock(newVC)
+				for pageId in logE.entryList:
+					pageVector[pageId] = newVC.copy()
 				self.addTxnEntryToLog(logId, logE)
 		elif self.typeOfSchedule == 1:
 			#smart

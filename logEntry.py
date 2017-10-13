@@ -34,7 +34,6 @@ class LogEntry:
         self.numOfPages = 0
         self.txnId = tId
         self.entryList = list()
-        self.entryList.append(tId) #add the transaction id to log entry
         self.vc = None
         self.addOnePageUpdate(line1)
         if line2 != "":
@@ -43,6 +42,15 @@ class LogEntry:
     def addOnePageUpdate(self, line):
         self.entryList.append(int(line))
         self.numOfPages += 1
+    
+    def setVectorClock(self, vc):
+        assert lessThan(self.vc, vc) == True
+        self.vc = vc.copy()
 
     def __str__(self):
-        return ""
+        objStr = str(tId)
+        for entry in self.entryList:
+            objStr += "-" + str(entry) 
+        for i in self.vc:
+            objStr += "-" + str(i)
+        return objStr
