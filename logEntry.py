@@ -42,15 +42,15 @@ class LogEntry:
     def addOnePageUpdate(self, line):
         self.entryList.append(int(line))
         self.numOfPages += 1
-    
+
     def setVectorClock(self, vc):
         assert lessThan(self.vc, vc) == True
         self.vc = vc.copy()
 
     def __str__(self):
-        objStr = str(tId)
+        objStr = str(self.txnId)
         for entry in self.entryList:
-            objStr += "-" + str(entry) 
+            objStr += "-" + str(entry)
         for i in self.vc:
             objStr += "-" + str(i)
         return objStr
