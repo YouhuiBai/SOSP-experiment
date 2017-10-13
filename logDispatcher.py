@@ -27,7 +27,7 @@ placing entries and sending plans to log handlers.
 
 class LogDispatcher :
 	Queue = []
-	mutex = threading.Lock()
+	mutex = threading.Condition()
 
 	def __init__(self, numOfLogs, typeOfSchedule) :
 		print("The LogDispatcher class")
@@ -47,11 +47,6 @@ class LogDispatcher :
 			t = threading.Thread(target = indivLog.flushEntry, args = (logId, ))
 			t.serDaemon(True) # set the thread as Daemon thread
 			t.start()
-
-
-	def updatePageVCs(self, pageId, vc):
-		pageVector[pageId] = vc
-		print("update vc of page ",pageId, " to ", vc)
 
 	def addTxnEntryToLog(self, logId, logEty):
 		logEtyList = self.entryToLogDict[logId]
@@ -101,8 +96,15 @@ class LogDispatcher :
     a) every 5 ms
     b) receiving every 10 entries
     '''
-	def analysis(self) :
-		pass
+	def startAnalysis(self) :
+		while True:
+			mutex.acquire()
+			while len(Queue) == 0:
+				mutex.wait(0.001) #1ms
+			self.generateLogPlans(Queue)
+			Queue.clear()
+			mutex.release()
+		
 
 	'''
 	Send a list of entries to a specific log

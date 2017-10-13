@@ -20,6 +20,8 @@ class TxnExecutor :
 			logentry = LogEntry(int(txn), line1)
 		LogDispatcher.Queue.append(logentry.entryList)
 
+		#check the length of queue
+		#if queue is larger than 20 notify
 		LogDispatcher.mutex.release()
 
 	def executor(self, id) :

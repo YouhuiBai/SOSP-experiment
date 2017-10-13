@@ -10,7 +10,12 @@ from logDispatcher import *
 class Simulator :
 	def __init__(self) :
 		self.threadList = []
-	def run(self, workerNum) :
+	def run(self, workerNum, logNum) :
+		#create logDispatcher
+		logDisp = LogDispatcher(logNum, 0)
+		threadOfLogDispatcher = threading.Thread(target = logDisp.startAnalysis, args = None)
+		threadOfLogDispatcher.start()
+		
 		for i in range(workerNum) :
 			t = threading.Thread(target = TxnExecutor().executor, args = (i, )) # executor per thread
 			t.setDaemon(True)
@@ -21,10 +26,12 @@ class Simulator :
 
 if __name__ == "__main__" :
 	S = Simulator()
-	S.run(page.workerNum)
+	S.run(page.workerNum, page.logNum)
 
+	'''
 	f = open("output.data", "w")
 	for q in LogDispatcher.Queue :
 		f.write(str(q))
 		f.write("\n")
 	f.close()
+	'''
