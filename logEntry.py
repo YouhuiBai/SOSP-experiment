@@ -44,13 +44,13 @@ class LogEntry:
         self.numOfPages += 1
 
     def setVectorClock(self, vc):
-        assert lessThan(self.vc, vc) == True
         self.vc = vc.copy()
 
     def __str__(self):
         objStr = str(self.txnId)
         for entry in self.entryList:
             objStr += "-" + str(entry)
-        for i in self.vc:
-            objStr += "-" + str(i)
+        if self.vc != None :
+            for i in self.vc:
+                objStr += "-" + str(i)
         return objStr

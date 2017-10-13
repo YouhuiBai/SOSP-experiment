@@ -18,7 +18,7 @@ class TxnExecutor :
 			logentry = LogEntry(int(txn), line1, line2)
 		else :
 			logentry = LogEntry(int(txn), line1)
-		LogDispatcher.Queue.append(logentry.__str__())
+		LogDispatcher.Queue.append(logentry)
 
 		#check the length of queue
 		#if queue is larger than 20 notify

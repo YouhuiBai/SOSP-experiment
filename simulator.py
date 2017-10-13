@@ -13,19 +13,21 @@ class Simulator :
 	def run(self, workerNum, logNum) :
 		#create logDispatcher
 		logDisp = LogDispatcher(logNum, 0)
-		threadOfLogDispatcher = threading.Thread(target = logDisp.startAnalysis, args = None)
+		threadOfLogDispatcher = threading.Thread(target = logDisp.startAnalysis, args = ())
+		# threadOfLogDispatcher.setDaemon(True)
 		threadOfLogDispatcher.start()
-		
+
 		for i in range(workerNum) :
 			t = threading.Thread(target = TxnExecutor().executor, args = (i, )) # executor per thread
-			t.setDaemon(True)
+			# t.setDaemon(True)
 			self.threadList.append(t)
 			t.start()
-		for t in self.threadList :
-			t.join()
+		# for t in self.threadList :
+			# t.join()
 
 if __name__ == "__main__" :
 	S = Simulator()
+
 	S.run(page.workerNum, page.logNum)
 
 	'''

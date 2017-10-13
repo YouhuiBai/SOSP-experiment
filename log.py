@@ -13,20 +13,23 @@ class Log :
 
 	def increLogLengthBy(self, delta):
 		self.length += delta
-		
+
 	def increVCBit(self):
 		self.currentVC[self.logId] += 1
-		
+
 	def setVectorClock(self, vc):
 		self.currentVC = vc.copy()
 
 	def flushEntry(self, logid) : # write one log entry to file
+
 		context = zmq.Context()
 		socket = context.socket(zmq.SUB)
-		socket.connect("tcp://127.0.0.1:5000")
-		socket.setsockopt(zmq.SUBSCRIBE,'')
+		socket.connect("tcp://127.0.0.1:500%d"%(logid))
+		socket.setsockopt_string(zmq.SUBSCRIBE,'')
 		while True:
+			print("flush")
 			logentry = socket.recv()
+			print("end recv")
 			if logentry == "end" :
 				print("the write is end")
 				break
