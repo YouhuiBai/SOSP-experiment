@@ -1,10 +1,12 @@
 import os
 import sys
+import zmq
 import threading
 
 import page
 import logEntry
 from test._test_multiprocessing import exception_throwing_generator
+from log import *
 
 def getScheduleTypeStr(t):
 	if t == 0:
@@ -25,31 +27,38 @@ placing entries and sending plans to log handlers.
 class LogDispatcher :
 	Queue = []
 	mutex = threading.Lock()
-	
+
 	def __init__(self, numOfLogs, typeOfSchedule) :
 		print("The LogDispatcher class")
 		self.numOfLogs = numOfLogs
 		self.typeOfSchedule = typeOfSchedule
-		print("Initialize LogDispatcher with ", numOfLogs, 
-			 " logs and the type of schedule is ", 
+		print("Initialize LogDispatcher with ", numOfLogs,
+			 " logs and the type of schedule is ",
 			               getScheduleTypeStr(typeOfSchedule))
-		
-	
+		'''
+		create log flush thread
+		'''
+		for i in range(self.numOfLogs) :
+			t = threading.Thread(target = Log().flushEntry, args = (logId, ))
+			t.serDaemon(True) # set the thread as Daemon thread
+			t.start()
+
+
 	def updatePageVCs(self, pageId, vc):
 		pageVector[pageId] = vc
 		print("update vc of page ",pageId, " to ", vc)
-		
+
 	def addTxnEntryToLog(self, logId, logEty):
 		logEtyList = entryToLogDict[logId]
 		if logEtyList == NULL:
 			logEtyList = list()
 			entryToLogDict[logId] = logEtyList
 		logEtyList.append(logEty)
-			
+
 	'''
 	Figure out the placement plans
-	@param[out] entryToLogDict: dict mapping log id 
-	            to a list of log entries 
+	@param[out] entryToLogDict: dict mapping log id
+	            to a list of log entries
 	'''
 	def generateLogPlans(self, entryList):
 		entryToLogDict = dict();
@@ -68,7 +77,7 @@ class LogDispatcher :
 			sys.exit()
 
 		return entryToLogDict
-	
+
 	'''
     This function will figure out how to place
     a set of records on logs. It will be only triggered
@@ -78,21 +87,25 @@ class LogDispatcher :
     '''
 	def analysis(self) :
 		pass
-	
+
 	'''
 	Send a list of entries to a specific log
 	'''
 	def sendEntriesToLog(self, logId, entryList):
 		# call the log functions
-		pass
-	
+		context = zmq.Context()
+		socket = context.socket(zmq.PUB)
+		socket.bind("tcp://127.0.0.1:5000")
+		# logEntry = input('input your data:')
+		print(entryList)
+		socket.send(entryList)
+
 	'''
 	Distribute log entries to different logs
-	@param[in] entryToLogDict: dict mapping log id to a list of 
+	@param[in] entryToLogDict: dict mapping log id to a list of
 	           log entries
 	'''
 	def sendEntriesToLogs(self, entryToLogDict):
 		for logId in range(0, self.numOfLogs - 1):
 			self.sendEntriesToLog(logId, entryToLogDict[logId])
 			print('send to log ',logId, " entries: ", entryToLogDict[logId])
-		
