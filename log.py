@@ -1,8 +1,18 @@
 import threading
 
 class Log :
-	def __init__(self) :
+	def __init__(self, logId, logN) :
 		print("The Log class")
+		self.length = 0
+		self.logId = logId
+		self.currentVC = [0] * logN
+	
+	def getLogLength(self):
+		return self.length;
+	
+	def increLogLengthBy(self, delta):
+		self.length += delta
+	
 	def writeEntry(self, logid, logentry) : # write one log entry to file
 		fp1 = open("%d.log"%(logid), "a") # output log entry to log file
 		fp2 = open("%d.data"%(logid), "a") # output log entry to analysis file
@@ -20,5 +30,6 @@ class Log :
 		fp.write(b'\x0a') # a new line
 		fp.flush()
 		fp.close()
+		
 	def getLog(self, logid) :
 		return open("%d.log"%(logid))

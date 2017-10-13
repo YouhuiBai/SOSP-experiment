@@ -3,6 +3,17 @@ import sys
 import threading
 
 import page
+import logEntry
+from test._test_multiprocessing import exception_throwing_generator
+
+def getScheduleTypeStr(t):
+	if t == 0:
+		return "Random"
+	elif t == 1:
+		return "Smart"
+	else:
+		print("Should not reach here!")
+		sys.exit()
 
 '''
 This file contains functions associated with
@@ -15,15 +26,26 @@ class LogDispatcher :
 	Queue = []
 	mutex = threading.Lock()
 	
-	def __init__(self, numOfLogs) :
+	def __init__(self, numOfLogs, typeOfSchedule) :
 		print("The LogDispatcher class")
 		self.numOfLogs = numOfLogs
+		self.typeOfSchedule = typeOfSchedule
+		print("Initialize LogDispatcher with ", numOfLogs, 
+			 " logs and the type of schedule is ", 
+			               getScheduleTypeStr(typeOfSchedule))
 		
 	
 	def updatePageVCs(self, pageId, vc):
 		pageVector[pageId] = vc
 		print("update vc of page ",pageId, " to ", vc)
-	
+		
+	def addTxnEntryToLog(self, logId, logEty):
+		logEtyList = entryToLogDict[logId]
+		if logEtyList == NULL:
+			logEtyList = list()
+			entryToLogDict[logId] = logEtyList
+		logEtyList.append(logEty)
+			
 	'''
 	Figure out the placement plans
 	@param[out] entryToLogDict: dict mapping log id 
@@ -31,7 +53,20 @@ class LogDispatcher :
 	'''
 	def generateLogPlans(self, entryList):
 		entryToLogDict = dict();
-		#TODO: fill in functions
+		if self.typeOfSchedule == 0:
+			#random
+			for logE in entryList:
+				logId = logE.txnId % self.numOfLogs
+				#obtain vc and update the log vc
+				self.addTxnEntryToLog(logId, logE)
+		elif self.typeOfSchedule == 1:
+			#smart
+			print("Not implemented!")
+			sys.exit()
+		else:
+			print("Should not reach here!")
+			sys.exit()
+
 		return entryToLogDict
 	
 	'''
