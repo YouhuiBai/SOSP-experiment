@@ -27,20 +27,18 @@ class Log :
 		socket.connect("tcp://127.0.0.1:500%d"%(logid))
 		socket.setsockopt_string(zmq.SUBSCRIBE,'')
 		while True:
-			print("flush")
 			logentry = socket.recv()
-			print("end recv")
-			if logentry == "end" :
+			if str(logentry) == "b'end'" :
 				print("the write is end")
 				break
 			else :
 				fp1 = open("%d.log"%(logid), "a") # output log entry to log file
 				fp2 = open("%d.data"%(logid), "a") # output log entry to analysis file
-				tmp = list()
-				for item in logentry : # may need to change logentry from string to list
-					tmp.append(str(item))
-				fp1.write(','.join(tmp))
-				fp2.write(','.join(tmp))
+				# tmp = list()
+				# for item in logentry : # may need to change logentry from string to list
+					# tmp.append(str(item))
+				fp1.write(str(logentry))
+				fp2.write(str(logentry))
 				fp2.write('\n')
 				fp2.close()
 				fp1.close()

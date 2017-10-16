@@ -25,10 +25,14 @@ class TxnExecutor :
 		LogDispatcher.mutex.release()
 
 	def executor(self, id) :
+		countLines = 0 #count read lines of the current executor
+		countCom = 0 #count committed transaction number
+
 		#read one trace record. implemented in main
 		bound = page.tracelines // page.workerNum // 2 #the number of times each executor reads
 		# print("bound: %d"%(bound)) #debug
 		for i in range(bound) :
+			countLines += 2
 			offset = (page.workerNum * i + id) * 2 # read the specific line for this executor
 			# print("id: ", id, " offset: ", offset) #debug
 			line1 = linecache.getline("trace.data", offset + 1)
@@ -41,6 +45,9 @@ class TxnExecutor :
 				self.commit(offset / 2, linetmp)
 			elif pagenum == 2 :
 				self.commit(offset  / 2, line1, line2)
+			countCom += 1
+		# print("executor%d read %d lines"%(id, countLines)) #debug
+		# print("executor%d commit %d Txns"%(id, countCom)) #debug
 		#prepare a log entry and send the log entry to logDispatcher queue
 
 

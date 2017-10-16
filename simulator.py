@@ -19,16 +19,25 @@ class Simulator :
 
 		for i in range(workerNum) :
 			t = threading.Thread(target = TxnExecutor().executor, args = (i, )) # executor per thread
-			# t.setDaemon(True)
+			t.setDaemon(True)
 			self.threadList.append(t)
 			t.start()
-		# for t in self.threadList :
-			# t.join()
+		for t in self.threadList :
+			t.join()
+
+
+
+		threadOfLogDispatcher.join()
+		# end the log thread(s)
+		for i in range(logNum) :
+			logDisp.socketList[i].send_string("end")
 
 if __name__ == "__main__" :
-	S = Simulator()
 
+	S = Simulator()
 	S.run(page.workerNum, page.logNum)
+
+
 
 	'''
 	f = open("output.data", "w")
