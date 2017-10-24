@@ -24,12 +24,12 @@ class TxnExecutor :
 		#if queue is larger than 20 notify
 		LogDispatcher.mutex.release()
 
-	def executor(self, id) :
+	def executor(self, id, tracelines) :
 		countLines = 0 #count read lines of the current executor
 		countCom = 0 #count committed transaction number
 
 		#read one trace record. implemented in main
-		bound = page.tracelines // page.workerNum // 2 #the number of times each executor reads
+		bound = tracelines // page.workerNum // 2 #the number of times each executor reads
 		# print("bound: %d"%(bound)) #debug
 		for i in range(bound) :
 			countLines += 2

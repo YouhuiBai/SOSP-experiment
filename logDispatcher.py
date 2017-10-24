@@ -29,13 +29,14 @@ class LogDispatcher :
 	Queue = []
 	mutex = threading.Condition()
 
-	def __init__(self, numOfLogs, typeOfSchedule) :
+	def __init__(self, numOfLogs, typeOfSchedule, outFile) :
 		print("The LogDispatcher class")
 		self.numOfLogs = numOfLogs
 		self.typeOfSchedule = typeOfSchedule
 		self.entryToLogDict = dict()
 		self.logList = list()
 		self.socketList = list()
+		self.logThread = list()
 
 		print("Initialize LogDispatcher with ", numOfLogs,
 			 " logs and the type of schedule is ",
@@ -56,8 +57,9 @@ class LogDispatcher :
 		for i in range(self.numOfLogs) :
 			indivLog = Log(i, self.numOfLogs)
 			self.logList.append(indivLog)
-			t = threading.Thread(target = indivLog.flushEntry, args = (i, )) # start the subsribe thread
-			# t.setDaemon(True) # set the thread as Daemon thread
+			t = threading.Thread(target = indivLog.flushEntry, args = (i, outFile, )) # start the subsribe thread
+			self.logThread.append(t)
+			t.setDaemon(True) # set the thread as Daemon thread
 			t.start()
 
 	def addTxnEntryToLog(self, logId, logEty):
@@ -118,8 +120,9 @@ class LogDispatcher :
     a) every 5 ms
     b) receiving every 10 entries
     '''
-	def startAnalysis(self) :
+	def startAnalysis(self, tracelines) :
 		countTxn = 0
+		print("tracelines in analysis:",tracelines)
 		while True:
 			LogDispatcher.mutex.acquire()
 			if countTxn == tracelines / 2 : # the analysis thread has processed all transactions
@@ -134,6 +137,9 @@ class LogDispatcher :
 			self.generateLogPlans(LogDispatcher.Queue)
 			LogDispatcher.Queue.clear()
 			LogDispatcher.mutex.release()
+
+		for i in range(self.numOfLogs) :
+			self.socketList[i].send_string("end")
 
 
 	'''
